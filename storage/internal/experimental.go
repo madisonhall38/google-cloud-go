@@ -26,6 +26,8 @@ var (
 	// Set an alternate client-side metric Exporter to emit metrics through.
 	WithMetricExporter any // func (*metric.Exporter) option.ClientOption
 
+	WithMeterProvider any // func (metric.MeterProvider) option.ClientOption
+
 	// WithReadStallTimeout is a function which is implemented by storage package.
 	// It takes ReadStallTimeoutConfig as inputs and returns a option.ClientOption.
 	WithReadStallTimeout any // func (*ReadStallTimeoutConfig) option.ClientOption

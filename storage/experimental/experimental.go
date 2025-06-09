@@ -44,6 +44,13 @@ func WithMetricExporter(ex *metric.Exporter) option.ClientOption {
 	return internal.WithMetricExporter.(func(*metric.Exporter) option.ClientOption)(ex)
 }
 
+func WithMeterProvider(mp *metric.MeterProvider) option.ClientOption {
+	// WithMeterProvider is a no-op in the experimental package.
+	// It is provided for compatibility with the main package.
+	// The main package will use the MeterProvider from the client options.
+	return internal.WithMeterProvider.(func(*metric.MeterProvider) option.ClientOption)(mp)
+}
+
 // WithReadStallTimeout provides a [option.ClientOption] that may be passed to [storage.NewClient].
 // It enables the client to retry stalled requests when starting a download from
 // Cloud Storage. If the timeout elapses with no response from the server, the request

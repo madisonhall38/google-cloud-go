@@ -183,6 +183,40 @@ func TestNewGRPCMetricContext(t *testing.T) {
 	}
 }
 
+func TestNewGRPCMetricContextWithCustomProvider(t *testing.T) {
+	// Create a manual reader for collecting metrics.
+	mr := metric.NewManualReader()
+
+	// Create a custom meter provider with the manual reader.
+	customProvider := metric.NewMeterProvider(
+		metric.WithReader(mr),
+	)
+	ctx := context.Background()
+
+	cfg := metricsConfig{
+		project:         "project-id",
+		meterProvider:   customProvider, // use custom provider
+		disableExporter: true,           // disable since this is a unit test
+	}
+
+	mc, err := newGRPCMetricContext(ctx, cfg)
+	if err != nil {
+		t.Errorf("newGRPCMetricContext: %v", err)
+	}
+	defer mc.close()
+
+	// Verify the provider in metricsContext is our custom provider.
+	if mc.provider != customProvider {
+		t.Errorf("metricsContext.provider = %v, want %v", mc.provider, customProvider)
+	}
+
+	// Now we can collect metrics from the manual reader that's registered with our custom provider.
+	rm := metricdata.ResourceMetrics{}
+	if err := mr.Collect(ctx, &rm); err != nil {
+		t.Errorf("ManualReader.Collect: %v", err)
+	}
+}
+
 func TestNewExporterLogSuppressor(t *testing.T) {
 	ctx := context.Background()
 	s := &exporterLogSuppressor{Exporter: &failingExporter{}}

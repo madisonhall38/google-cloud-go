@@ -38,6 +38,7 @@ const (
 func init() {
 	// initialize experimental options
 	storageinternal.WithMetricExporter = withMetricExporter
+	storageinternal.WithMeterProvider = withMeterProvider
 	storageinternal.WithMetricInterval = withMetricInterval
 	storageinternal.WithReadStallTimeout = withReadStallTimeout
 	storageinternal.WithGRPCBidiReads = withGRPCBidiReads
@@ -80,6 +81,7 @@ type storageConfig struct {
 	readAPIWasSet          bool
 	disableClientMetrics   bool
 	metricExporter         *metric.Exporter
+	meterProvider          *metric.MeterProvider
 	metricInterval         time.Duration
 	manualReader           *metric.ManualReader
 	readStallTimeoutConfig *experimental.ReadStallTimeoutConfig
@@ -195,6 +197,19 @@ func withMetricExporter(ex *metric.Exporter) option.ClientOption {
 
 func (w *withMetricExporterConfig) ApplyStorageOpt(c *storageConfig) {
 	c.metricExporter = w.metricExporter
+}
+
+type withMeterProviderConfig struct {
+	internaloption.EmbeddableAdapter
+	meterProvider *metric.MeterProvider
+}
+
+func withMeterProvider(provider *metric.MeterProvider) option.ClientOption {
+	return &withMeterProviderConfig{meterProvider: provider}
+}
+
+func (w *withMeterProviderConfig) ApplyStorageOpt(c *storageConfig) {
+	c.meterProvider = w.meterProvider
 }
 
 type withTestMetricReaderConfig struct {
